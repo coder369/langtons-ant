@@ -120,7 +120,7 @@ function Simulation() {
         var iterationCount = document.getElementById('iterationCount');
         var canvas = document.getElementById('theBoard');
         var ctx = canvas.getContext('2d');
-        var cellSize = 10;
+        var cellSize = 8;
         var cellOffset = .5;
         var Orientation = [
             [{x: -1, y: 0}, {x: 0, y: -1}, {x: 1, y: 0}],   //Up - North
@@ -169,8 +169,8 @@ function Simulation() {
                 iterationCount.innerText = '0';
             },
             printAntOrientation: function () {
-                var Screen_x = (Ant.x * cellSize) + cellOffset + 5,
-                    Screen_y = (Ant.y * cellSize) + cellOffset + 5,
+                var Screen_x = (Ant.x * cellSize) + cellOffset + (cellSize / 2),
+                    Screen_y = (Ant.y * cellSize) + cellOffset + (cellSize / 2),
                     drawPoint = Orientation[Ant.orientation];
 
                 ctx.fillStyle = '#000';
