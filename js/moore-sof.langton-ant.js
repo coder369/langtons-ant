@@ -5,15 +5,18 @@
  */
 
 
-/*******************
+/********************
  ***  Simulation  ***
  ********************/
 function Simulation() {
 
-    /****************
+    var iterator = null;
+
+
+    /*****************
      ***  Options  ***
      *****************/
-    var Options = function () {
+    var Options = (function () {
 
         var opts = {
                 gridSize: 150,
@@ -60,7 +63,7 @@ function Simulation() {
             }
 
             function getUniqueColor(hexColor) {
-                for (var i = 0; i < colors.length; i++) {
+                for (var i = 0, len = colors.length; i < len; i++) {
                     if (colors[i] == hexColor) getUniqueColor(generateRandomColor());
                 }
                 return hexColor;
@@ -69,19 +72,19 @@ function Simulation() {
             return colors;
         }
 
-        function generateBehaviorOptions() {
+        (function generateBehaviorOptions() {
             var behaviors = getBehaviors();
             var behaviorElement = document.getElementById('behaviors');
 
-            for (var y = 0; y < behaviors.length; y++) {
+            for (var y = 0, len = behaviors.length; y < len; y++) {
                 var opt = '';
-                for (var i = 0; i < behaviors[y].turns.length; i++) {
+                for (var i = 0, lenTurns = behaviors[y].turns.length;i<lenTurns; i++) {
                     opt += behaviors[y].turns[i];
                 }
                 behaviorElement.appendChild(new Option(opt, y))
             }
             behaviorElement.appendChild(new Option('Custom', -1))
-        }
+        })();
 
         return {
             setGridSize: function (gridSize) {
@@ -104,16 +107,15 @@ function Simulation() {
             setRefreshDelayInterval: function (milliseconds) {
                 opts.milliseconds = parseInt(milliseconds);
             },
-            generateBehaviorOptions: generateBehaviorOptions,
             get: opts
         }
-    };
+    })();
 
 
-    /***************
+    /****************
      ***  Canvas  ***
      ****************/
-    var Screen = function () {
+    var Screen = (function () {
         var antBehaviorAlgorithm = document.getElementById('displayAntBehavior');
         var iterationCount = document.getElementById('iterationCount');
         var canvas = document.getElementById('theBoard');
@@ -135,7 +137,7 @@ function Simulation() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             },
             printGrid: function () {
-                var gridCanvasSize = (options.get.gridSize * cellSize) + (cellSize * 2);
+                var gridCanvasSize = (Options.get.gridSize * cellSize) + (cellSize * 2);
                 this.setCanvasSize(gridCanvasSize);
 
                 for (var x = cellOffset; x < gridCanvasSize; x += cellSize) {
@@ -156,7 +158,7 @@ function Simulation() {
                     y = (Ant.y * cellSize) + 1,
                     wh = cellSize - 1;
 
-                ctx.fillStyle = options.get.behavior.colors[cellState];
+                ctx.fillStyle = Options.get.behavior.colors[cellState];
                 //ctx.clearRect(x, y, wh, wh);
                 ctx.fillRect(x, y, wh, wh);
             },
@@ -167,21 +169,21 @@ function Simulation() {
                 iterationCount.innerText = '0';
             },
             printAntOrientation: function () {
-                var screen_x = (Ant.x * cellSize) + cellOffset + 5,
-                    screen_y = (Ant.y * cellSize) + cellOffset + 5,
+                var Screen_x = (Ant.x * cellSize) + cellOffset + 5,
+                    Screen_y = (Ant.y * cellSize) + cellOffset + 5,
                     drawPoint = Orientation[Ant.orientation];
 
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.moveTo(screen_x + drawPoint[0].x, screen_y + drawPoint[0].y);
-                ctx.lineTo(screen_x + drawPoint[1].x, screen_y + drawPoint[1].y);
-                ctx.lineTo(screen_x + drawPoint[2].x, screen_y + drawPoint[2].y);
+                ctx.moveTo(Screen_x + drawPoint[0].x, Screen_y + drawPoint[0].y);
+                ctx.lineTo(Screen_x + drawPoint[1].x, Screen_y + drawPoint[1].y);
+                ctx.lineTo(Screen_x + drawPoint[2].x, Screen_y + drawPoint[2].y);
                 ctx.fill();
             },
             printBehaviorAlgorithm: function (behavior) {
                 var turns = '';
 
-                for (var i = 0; i < behavior.turns.length; i++) {
+                for (var i = 0, len = behavior.turns.length; i < len; i++) {
                     turns += '<span class="behavior" style="background-color:' + behavior.colors[i] + ' !important;"><img src="img/' + behavior.turns[i] + '.png" alt="' + behavior.turns[i] + '"/></span>';
                 }
 
@@ -191,24 +193,18 @@ function Simulation() {
                 antBehaviorAlgorithm.innerHTML = '';
             }
         }
-    };
-
-    var options = new Options(),
-        screen = new Screen(),
-        iterator = null;
-
-    options.generateBehaviorOptions();
+    })();
 
 
-    /*************
+    /**************
      ***  Grid  ***
      **************/
     var Grid = {
         init: function () {
-            this.cells = new Int8Array(options.get.gridSize + (options.get.gridSize * options.get.gridSize));
+            this.cells = new Int8Array(Options.get.gridSize + (Options.get.gridSize * Options.get.gridSize));
 
-            screen.clearCanvas();
-            screen.printGrid();
+            Screen.clearCanvas();
+            Screen.printGrid();
         },
         getCellState: function (cellIndex) {
             return this.cells[cellIndex];
@@ -219,24 +215,24 @@ function Simulation() {
     };
 
 
-    /************
+    /*************
      ***  Ant  ***
      *************/
     var Ant = {
         init: function () {
 
             //Put the ant in the middle of the grid
-            this.x = Math.floor(options.get.gridSize / 2);
-            this.y = Math.floor(options.get.gridSize / 2);
+            this.x = Math.floor(Options.get.gridSize / 2);
+            this.y = Math.floor(Options.get.gridSize / 2);
 
             //Point the ant in a North:0, East:1, South:2, or West:3
-            this.orientation = options.get.orientationIndex;
+            this.orientation = Options.get.orientationIndex;
 
             //Get the index of the cell the ant was placed on
-            this.cellIndex = this.y + this.x * options.get.gridSize;
+            this.cellIndex = this.y + this.x * Options.get.gridSize;
         },
         turn: function (cellState) {
-            if (options.get.behavior.turns[cellState] === 'R') {
+            if (Options.get.behavior.turns[cellState] === 'R') {
                 this.orientation = (this.orientation + 5) % 4
             } else {
                 this.orientation = (this.orientation + 3) % 4
@@ -249,42 +245,42 @@ function Simulation() {
                 this.x -= this.orientation - 2;
             }
 
-            this.cellIndex = this.y + this.x * options.get.gridSize;
+            this.cellIndex = this.y + this.x * Options.get.gridSize;
         }
     };
 
     function run() {
         var runCtx = this;
 
-        runCtx.delay = options.get.milliseconds;
-        runCtx.iterations = options.get.intervalCount;
+        runCtx.delay = Options.get.milliseconds;
+        runCtx.iterations = Options.get.intervalCount;
 
         reset();
 
-        screen.printBehaviorAlgorithm(options.get.behavior);
+        Screen.printBehaviorAlgorithm(Options.get.behavior);
         var iterations = 0;
         iterator = setInterval(function () {
             for (var i = 0; i < runCtx.iterations; i++) {
                 if (runStep()) {
                     clearInterval(iterator);
-                    screen.printIterationCount(iterations);
+                    Screen.printIterationCount(iterations);
                     break;
                 }
                 iterations++;
             }
 
-            screen.printIterationCount(iterations);
+            Screen.printIterationCount(iterations);
 
         }, runCtx.delay);
 
         function runStep() {
             var currentCellState = Grid.getCellState(Ant.cellIndex);
-            var newCellState = (currentCellState + 1) % options.get.behavior.colors.length;
+            var newCellState = (currentCellState + 1) % Options.get.behavior.colors.length;
 
             Grid.setCellState(Ant.cellIndex, newCellState);
 
-            screen.printCellState(currentCellState);
-            screen.printAntOrientation();
+            Screen.printCellState(currentCellState);
+            Screen.printAntOrientation();
 
             Ant.turn(currentCellState);
             Ant.move();
@@ -297,8 +293,8 @@ function Simulation() {
 
     function reset() {
         clearInterval(iterator);
-        screen.clearBehaviorAlgorithm();
-        screen.clearIterationCount();
+        Screen.clearBehaviorAlgorithm();
+        Screen.clearIterationCount();
         Grid.init();
         Ant.init();
     }
@@ -306,6 +302,6 @@ function Simulation() {
     return {
         run: run,
         reset: reset,
-        Options: options
+        Options: Options
     }
 }
