@@ -256,9 +256,9 @@ function Simulation() {
 
         Screen.printBehaviorAlgorithm(Options.get.behavior);
 
-        function runSteps() {
-            var iterations = 0;
+        var iterations = 0;
 
+        function runSteps() {
             for (var i = 0, intervals = Options.get.intervalCount; i < intervals; i++) {
                 if (runStep()) {
                     clearInterval(iterator);
