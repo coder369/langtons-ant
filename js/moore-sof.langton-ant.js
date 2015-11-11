@@ -250,17 +250,16 @@ function Simulation() {
     };
 
     function run() {
-        var runCtx = this;
-
-        runCtx.delay = Options.get.milliseconds;
-        runCtx.iterations = Options.get.intervalCount;
-
         reset();
 
+        iterator = setInterval(runSteps, Options.get.milliseconds);
+
         Screen.printBehaviorAlgorithm(Options.get.behavior);
-        var iterations = 0;
-        iterator = setInterval(function () {
-            for (var i = 0; i < runCtx.iterations; i++) {
+
+        function runSteps() {
+            var iterations = 0;
+
+            for (var i = 0, intervals = Options.get.intervalCount; i < intervals; i++) {
                 if (runStep()) {
                     clearInterval(iterator);
                     Screen.printIterationCount(iterations);
@@ -270,8 +269,7 @@ function Simulation() {
             }
 
             Screen.printIterationCount(iterations);
-
-        }, runCtx.delay);
+        }
 
         function runStep() {
             var currentCellState = Grid.getCellState(Ant.cellIndex);
