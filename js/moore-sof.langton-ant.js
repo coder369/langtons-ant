@@ -23,7 +23,7 @@ function Simulation() {
                 behavior: getBehaviors()[0],
                 orientationIndex: 0,
                 intervalCount: 1,
-                milliseconds: 0
+                milliseconds: 250
             }
             , behaviorsList;
 
